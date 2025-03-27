@@ -17,7 +17,7 @@ const userSchema = new Schema(
       require: true,
       unique: true,
       lowercase: true,
-      trim: true, 
+      trim: true,
     },
     fullName: {
       type: String,
@@ -43,6 +43,9 @@ const userSchema = new Schema(
       require: [true, "Password is required"],
       minLength: [6, "Password should be at least 6 characters long"],
       maxLength: [46, "Password should be at most 64 characters long"],
+    },
+    refreshToken: {
+      typeof: String,
     },
   },
   { timestamps: true }
