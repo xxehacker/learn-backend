@@ -66,14 +66,15 @@ userSchema.methods.isPasswordCorrect = async function (password) {
 
 // Generate Access Token
 userSchema.methods.generateAccessToken = function () {
-  jwt.sign(
+  //! NOTE: If we forget to add the "return" statement, it will return undefined as a result and the generateAccessToken function will not generate an access token.
+  return jwt.sign(
     {
       _id: this._id,
       email: this.email,
       username: this.username,
       fullName: this.fullName,
     },
-    process.env.ACCES_TOKEN_SECRET,
+    process.env.ACCESS_TOKEN_SECRET,
     {
       expiresIn: process.env.ACCESS_TOKEN_EXPIRY,
     }
@@ -82,7 +83,8 @@ userSchema.methods.generateAccessToken = function () {
 
 // Generate Rrefresh Token
 userSchema.methods.generateRefreshToken = function () {
-  jwt.sign(
+  //! NOTE: If we forget to add the "return" statement, it will return undefined as a result and the generateRefreshToken function will not generate an refresh token.
+  return jwt.sign(
     {
       _id: this._id,
     },

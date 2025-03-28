@@ -4,9 +4,10 @@ import { User } from "../models/user.model.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 
-const generateAccessAndRefreshTokens = async (userId) => {
+const generateAccessAndRefereshTokens = async (userId) => {
   try {
     const user = await User.findById(userId);
+    // console.log("user from generate token function",user)
     const accessToken = user.generateAccessToken();
     const refreshToken = user.generateRefreshToken();
 
@@ -132,9 +133,9 @@ const loginUser = asyncHandler(async (req, res) => {
 
   try {
     const { username, email, password } = req.body;
-    console.log(username, email, password);
+    // console.log(username, email, password);
 
-    if (!username || !email) {
+    if (!username && !email) {
       throw new ApiError(400, "Username or Email is required");
     }
 
@@ -145,7 +146,7 @@ const loginUser = asyncHandler(async (req, res) => {
     const user = await User.findOne({
       $or: [{ username }, { email }],
     });
-    console.log("user: ", user);
+    // console.log("user: ", user);
 
     if (!user) {
       throw new ApiError(404, "User does not exist");
@@ -153,17 +154,21 @@ const loginUser = asyncHandler(async (req, res) => {
 
     const isPasswordValid = await user.isPasswordCorrect(password);
 
+    // console.log("isPasswordValid",isPasswordValid);
+
     if (!isPasswordValid) {
       throw new ApiError(401, "Invalid user credentials");
     }
 
-    const { accessToken, refreshToken } = await generateAccessAndRefreshTokens(
+    const { accessToken, refreshToken } = await generateAccessAndRefereshTokens(
       user._id
     );
+    // console.log(accessToken, refreshToken);
 
     const loggedInUser = await User.findById(user._id).select(
       "-password -refreshToken"
     );
+    // console.log(loggedInUser);
 
     // send these to the user via cookie
     const options = {
@@ -207,8 +212,7 @@ const logOutUser = asyncHandler(async (req, res) => {
       secure: true,
     };
 
-    return;
-    res
+    return res
       .status(200)
       .clearCookie("accessToken", options)
       .clearCookie("refreshToken", options)
