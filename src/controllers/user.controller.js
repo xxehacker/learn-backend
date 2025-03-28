@@ -23,7 +23,7 @@ const generateAccessAndRefreshTokens = async (userId) => {
 };
 
 const registerUser = asyncHandler(async (req, res) => {
-  /*`
+  /*
     1. get user details from frontend
     2. validation
     3. check if user already exists,
@@ -32,7 +32,7 @@ const registerUser = asyncHandler(async (req, res) => {
     6. create user object - create entry in db
     7. remove password amd refresh token field from response
     8. check for user creation
-    9. retturn response
+    9. return response
   */
 
   try {
@@ -100,7 +100,7 @@ const registerUser = asyncHandler(async (req, res) => {
     }
     */
 
-    //   we can also check user creation this way and using select we remove the specific field from the user object.(Security purpose)
+    // we can also check user creation this way and using select we remove the specific field from the user object.(Security purpose)
     const createdUser = await User.findById(user._id).select(
       "-password -refreshToken"
     );
@@ -132,6 +132,7 @@ const loginUser = asyncHandler(async (req, res) => {
 
   try {
     const { username, email, password } = req.body;
+    console.log(username, email, password);
 
     if (!username || !email) {
       throw new ApiError(400, "Username or Email is required");
@@ -144,6 +145,7 @@ const loginUser = asyncHandler(async (req, res) => {
     const user = await User.findOne({
       $or: [{ username }, { email }],
     });
+    console.log("user: ", user);
 
     if (!user) {
       throw new ApiError(404, "User does not exist");
@@ -185,6 +187,35 @@ const loginUser = asyncHandler(async (req, res) => {
   }
 });
 
-const logOutUser = asyncHandler(async (req, res) => {});
+const logOutUser = asyncHandler(async (req, res) => {
+  try {
+    const user = req.user._id;
+    await User.findByIdAndUpdate(
+      user,
+      {
+        $set: {
+          refreshToken: undefined,
+        },
+      },
+      {
+        new: true,
+      }
+    );
+
+    const options = {
+      httpOnly: true,
+      secure: true,
+    };
+
+    return;
+    res
+      .status(200)
+      .clearCookie("accessToken", options)
+      .clearCookie("refreshToken", options)
+      .json(new ApiResponse(200, {}, "User logged Out"));
+  } catch (error) {
+    throw new ApiError(500, "Something went wrong while logging out the user");
+  }
+});
 
 export { registerUser, loginUser, logOutUser };
