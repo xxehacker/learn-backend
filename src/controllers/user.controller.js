@@ -280,7 +280,7 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
 const changeCurrentPassword = asyncHandler(async (req, res) => {
   try {
     const { oldPassword, newPassword } = req.body;
-    // console.log(req.user);
+    console.log(oldPassword, newPassword);
 
     if (!oldPassword || !newPassword) {
       throw new ApiError(400, "Old Password & New Password is Required");
@@ -290,6 +290,7 @@ const changeCurrentPassword = asyncHandler(async (req, res) => {
     // console.log("user", user);
 
     const isPasswordCorrect = await user.isPasswordCorrect(oldPassword);
+    // console.log("isPasswordCorrect:", isPasswordCorrect);
 
     if (!isPasswordCorrect) {
       throw new ApiError(400, "Invalid old password");
@@ -301,13 +302,18 @@ const changeCurrentPassword = asyncHandler(async (req, res) => {
     return res
       .status(200)
       .json(new ApiResponse(200, {}, "Password changed successfully"));
-      
   } catch (error) {
     throw new ApiError(
       500,
-      "Something went wrong while changing current password"
+      error?.message || "Something went wrong while changing current password"
     );
   }
+});
+
+const getCurrentUser = asyncHandler(async (req, res) => {
+  return res
+    .status(200)
+    .json(new ApiResponse(200, req.user, "Current user fetched successfully"));
 });
 
 export {
@@ -316,4 +322,5 @@ export {
   logOutUser,
   refreshAccessToken,
   changeCurrentPassword,
+  getCurrentUser,
 };
