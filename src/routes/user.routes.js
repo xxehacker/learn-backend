@@ -8,7 +8,8 @@ import {
   getCurrentUser,
   updateAccountDetails,
   updateUserAvatar,
-  updateUserCoverImage
+  updateUserCoverImage,
+  getUserChannelProfile
 } from "../controllers/user.controller.js";
 import { upload } from "../middlewares/multer.middleware.js";
 import { verifyToken } from "../middlewares/auth.middleware.js";
@@ -46,9 +47,10 @@ router.route("/change-password").post(verifyToken, changeCurrentPassword);
 router.route("/get-current-user").get(verifyToken, getCurrentUser);
 router.route("/update-account-details").patch(verifyToken, updateAccountDetails);
 
-// Handle image
+// Image Route
 router.route("/update-avatar").patch(verifyToken,upload.single("avatar"), updateUserAvatar);
 router.route("/update-cover").patch(verifyToken,upload.single("coverImage"), updateUserCoverImage);
 
+router.route('/c/:username').get(verifyToken,getUserChannelProfile)
 
 export default router;
